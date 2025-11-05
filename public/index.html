@@ -330,14 +330,17 @@ let currentEditingIndex = null;
 // API Functions
 async function fetchProjects() {
     try {
+        console.log('Fetching projects from:', API_BASE);
         const response = await fetch(API_BASE);
+        console.log('Response status:', response.status, response.ok);
         if (!response.ok) throw new Error('Failed to fetch projects');
         projectData = await response.json();
+        console.log('Fetched projects:', projectData.length, projectData);
         updateAllUI();
     } catch (error) {
         console.error('Error fetching projects:', error);
         document.getElementById('dashboard-table-body').innerHTML = 
-            `<tr><td colspan="5" class="text-center py-10 text-red-500">Error loading projects. Please refresh the page.</td></tr>`;
+            `<tr><td colspan="5" class="text-center py-10 text-red-500">Error loading projects: ${error.message}. Please refresh the page.</td></tr>`;
     }
 }
 
@@ -493,14 +496,25 @@ function populateTable(projects) {
         tableBody.appendChild(row);
     });
     
-    document.querySelectorAll('#dashboard-table-body tr').forEach(r => {
+    // Add click listeners to table rows
+    const rows = document.querySelectorAll('#dashboard-table-body tr');
+    console.log('Found rows:', rows.length);
+    
+    rows.forEach((r, rowIndex) => {
+        console.log(`Row ${rowIndex}:`, r, 'Index:', r.dataset.index);
+        r.style.cursor = 'pointer';
         r.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
+            console.log('Row clicked!', r.dataset.index, 'Project data:', projectData);
             const index = parseInt(r.dataset.index, 10);
-            if (!isNaN(index) && index >= 0) {
+            console.log('Parsed index:', index);
+            if (!isNaN(index) && index >= 0 && index < projectData.length) {
+                console.log('Opening modal for index:', index);
                 openModal(index);
             } else {
-                console.error('Invalid index:', r.dataset.index);
+                console.error('Invalid index:', r.dataset.index, 'Project data length:', projectData.length);
+                alert('Error: Invalid project index. Check console for details.');
             }
         });
     });
@@ -525,26 +539,40 @@ function applyFilters() {
 }
 
 function openModal(index, isEditMode = false) {
+    console.log('openModal called with index:', index, 'isEditMode:', isEditMode);
     const numIndex = parseInt(index, 10);
+    console.log('Parsed index:', numIndex, 'Project data length:', projectData.length);
+    
     if (isNaN(numIndex) || numIndex < 0 || numIndex >= projectData.length) {
         console.error('Invalid project index:', index, 'Project data length:', projectData.length);
-        alert('Error: Could not open project details. Please refresh the page.');
+        alert(`Error: Invalid project index ${index}. Project data length: ${projectData.length}. Please refresh the page.`);
         return;
     }
     
     currentEditingIndex = numIndex;
     const project = projectData[numIndex];
+    console.log('Project at index:', project);
+    
     if (!project) {
         console.error('Project not found at index:', numIndex);
         alert('Error: Project not found. Please refresh the page.');
         return;
     }
 
+    const modal = document.getElementById('details-modal');
     const modalBackdrop = document.querySelector('#details-modal');
     const modalContent = document.querySelector('#details-modal .modal-content');
     const modalTitle = document.getElementById('modal-title');
     const modalBody = document.getElementById('modal-body');
     const modalFooter = document.getElementById('modal-footer');
+    
+    console.log('Modal elements:', { modal, modalBackdrop, modalContent, modalTitle, modalBody, modalFooter });
+    
+    if (!modal || !modalTitle || !modalBody || !modalFooter) {
+        console.error('Modal elements not found!');
+        alert('Error: Modal elements not found. Please check the HTML structure.');
+        return;
+    }
 
     modalTitle.innerHTML = isEditMode ? `<input id="edit-name" class="edit-input font-bold" value="${project.name}">` : project.name;
 
@@ -639,9 +667,16 @@ function openModal(index, isEditMode = false) {
         document.getElementById('edit-btn').addEventListener('click', () => openModal(index, true));
     }
 
+    // Show the modal
+    console.log('Showing modal...');
     modal.classList.remove('pointer-events-none');
     modalBackdrop.classList.remove('opacity-0');
     modalContent.classList.remove('scale-95');
+    console.log('Modal classes after show:', modal.className, modalBackdrop.className, modalContent.className);
+    
+    // Force display in case CSS is hiding it
+    modal.style.display = 'flex';
+    modal.style.zIndex = '50';
 }
 
 function addMilestone() {
@@ -1047,44 +1082,4 @@ document.addEventListener('DOMContentLoaded', function () {
     const cancelSheetsConfigBtn = document.getElementById('cancel-sheets-config-btn');
     const saveSheetsConfigBtn = document.getElementById('save-sheets-config-btn');
 
-    // Initial load
-    fetchProjects();
-    checkSheetsConfig();
-
-    // Filter listeners
-    document.querySelectorAll('#likelihood-filters .filter-tile').forEach(tile => {
-        tile.addEventListener('click', () => {
-            activeLikelihoodFilter = tile.dataset.filter;
-            document.querySelectorAll('#likelihood-filters .filter-tile').forEach(t => t.classList.remove('active'));
-            tile.classList.add('active');
-            applyFilters();
-        });
-    });
-    
-    // Button listeners
-    printBtn.addEventListener('click', () => window.print());
-    exportBtn.addEventListener('click', exportToCSV);
-    importBtn.addEventListener('click', openImportModal);
-    addProjectBtn.addEventListener('click', openAddProjectModal);
-
-    closeModalBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-
-    closeImportModalBtn.addEventListener('click', closeImportModal);
-    cancelImportBtn.addEventListener('click', closeImportModal);
-    confirmImportBtn.addEventListener('click', importFromCSV);
-    importModal.addEventListener('click', (e) => { if (e.target === importModal) closeImportModal(); });
-
-    // Google Sheets listeners
-    sheetsConfigBtn.addEventListener('click', openSheetsConfigModal);
-    syncToSheetsBtn.addEventListener('click', syncToSheets);
-    syncFromSheetsBtn.addEventListener('click', syncFromSheets);
-    closeSheetsConfigModalBtn.addEventListener('click', closeSheetsConfigModal);
-    cancelSheetsConfigBtn.addEventListener('click', closeSheetsConfigModal);
-    saveSheetsConfigBtn.addEventListener('click', saveSheetsConfig);
-    sheetsConfigModal.addEventListener('click', (e) => { if (e.target === sheetsConfigModal) closeSheetsConfigModal(); });
-});
-</script>
-</body>
-</html>
-
+    // 
