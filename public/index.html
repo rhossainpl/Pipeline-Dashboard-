@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Launch & Project Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .modal-backdrop {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            line-height: 1rem;
+            white-space: nowrap;
+        }
+        .status-green { background-color: #10B981; color: white; }
+        .status-yellow { background-color: #F59E0B; color: white; }
+        .status-red { background-color: #EF4444; color: white; }
+        .status-gray { background-color: #6B7280; color: white; }
+        .status-blue { background-color: #3B82F6; color: white; }
+        .status-purple { background-color: #8B5CF6; color: white; }
+
+        .tag {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            border-radius: 0.25rem;
+            text-transform: uppercase;
+        }
+        .tag-sky { background-color: #0EA5E9; color: white; }
+        .tag-emerald { background-color: #10B981; color: white; }
+        .tag-amber { background-color: #F59E0B; color: white; }
+        .tag-rose { background-color: #F43F5E; color: white; }
+        .tag-indigo { background-color: #6366F1; color: white; }
+        .tag-teal { background-color: #14B8A6; color: white; }
+        .tag-purple { background-color: #8B5CF6; color: white; }
+
+        .filter-tile {
+            transition: all 0.2s ease-in-out;
+        }
+        .filter-tile.active {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .filter-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .filter-btn.active {
+            background-color: #111827;
+            color: white;
+        }
+        .edit-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media print {
+            body {
+                font-family: sans-serif;
+                background-color: #fff !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .container {
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            .bg-white {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 9pt;
+            }
+            th, td {
+                border: 1px solid #ccc;
+                padding: 6px;
+            }
+            .status-pill, .tag {
+                border: 1px solid #000;
+                color: #000 !important;
+                background-color: #fff !important;
+                padding: 2px 4px;
+                font-size: 7pt;
+            }
+            header h1 {
+                font-size: 20pt;
+            }
+            header p {
+                font-size: 11pt;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="mb-8 flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">School Launch & Project Portfolio</h1>
+                <p class="text-gray-600 mt-1">B&M, Virtual, and Partnership Pipeline Overview</p>
+            </div>
+            <div class="no-print flex space-x-2">
+                <button id="add-project-btn" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                    Add Project
+                </button>
+                <button id="sheets-config-btn" class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+                    </svg>
+                    Google Sheets
+                </button>
+                <div id="sheets-sync-buttons" class="hidden flex space-x-2">
+                    <button id="sync-to-sheets-btn" class="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center gap-2 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+                        </svg>
+                        Sync To
+                    </button>
+                    <button id="sync-from-sheets-btn" class="px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+                        </svg>
+                        Sync From
+                    </button>
+                </div>
+                <button id="import-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center gap-2">Import Data</button>
+                <button id="export-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2">Export Data</button>
+                <button id="print-btn" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                        <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+                    </svg>
+                    Print View
+                </button>
+            </div>
+        </header>
+
+        <!-- Key Metrics Filter Tiles -->
+        <div id="likelihood-filters" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6 no-print">
+            <div data-filter="All" class="filter-tile active bg-white p-5 rounded-lg shadow-sm text-center cursor-pointer">
+                <h3 class="text-sm font-medium text-gray-500">Active Projects</h3>
+                <p class="text-4xl font-semibold text-gray-900" id="active-projects-count">0</p>
+            </div>
+            <div data-filter="Launching" class="filter-tile bg-white p-5 rounded-lg shadow-sm text-center cursor-pointer">
+                <h3 class="text-sm font-medium text-gray-500">Launching</h3>
+                <p class="text-4xl font-semibold text-blue-600" id="launching-count">0</p>
+            </div>
+            <div data-filter="High" class="filter-tile bg-white p-5 rounded-lg shadow-sm text-center cursor-pointer">
+                <h3 class="text-sm font-medium text-gray-500">High Likelihood</h3>
+                <p class="text-4xl font-semibold text-green-600" id="high-likelihood-count">0</p>
+            </div>
+             <div data-filter="Medium" class="filter-tile bg-white p-5 rounded-lg shadow-sm text-center cursor-pointer">
+                <h3 class="text-sm font-medium text-gray-500">Medium Likelihood</h3>
+                <p class="text-4xl font-semibold text-yellow-500" id="medium-likelihood-count">0</p>
+            </div>
+            <div data-filter="Low" class="filter-tile bg-white p-5 rounded-lg shadow-sm text-center cursor-pointer">
+                <h3 class="text-sm font-medium text-gray-500">Low Likelihood</h3>
+                <p class="text-4xl font-semibold text-red-500" id="low-likelihood-count">0</p>
+            </div>
+        </div>
+        
+        <!-- Project Type Filters -->
+        <div class="mb-8 text-center no-print">
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Filter by Project Type</h3>
+            <div id="type-filters" class="flex flex-wrap justify-center gap-2">
+                <!-- Filter buttons will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Main Dashboard Table -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Project / School Name</th>
+                            <th scope="col" class="px-6 py-3">Area / Region</th>
+                            <th scope="col" class="px-6 py-3">Details</th>
+                            <th scope="col" class="px-6 py-3">Key Dependencies</th>
+                            <th scope="col" class="px-6 py-3">Likelihood to Launch/Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dashboard-table-body">
+                        <tr><td colspan="5" class="text-center py-10">
+                            <div class="loading mx-auto"></div>
+                            <p class="mt-2 text-gray-500">Loading projects...</p>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Details Modal -->
+    <div id="details-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4 modal-backdrop opacity-0 pointer-events-none no-print">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-full overflow-y-auto modal-content transform scale-95">
+            <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center z-10">
+                <h2 id="modal-title" class="text-xl font-bold">Project Details</h2>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6">
+                <!-- Modal content will be dynamically inserted here -->
+            </div>
+             <div id="modal-footer" class="sticky bottom-0 bg-gray-50 border-t px-6 py-3 flex justify-end space-x-3">
+                <!-- Footer buttons will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Sheets Configuration Modal -->
+    <div id="sheets-config-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4 modal-backdrop opacity-0 pointer-events-none no-print">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-full overflow-y-auto modal-content transform scale-95">
+            <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center z-10">
+                <h2 class="text-xl font-bold">Google Sheets Configuration</h2>
+                <button id="close-sheets-config-modal-btn" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div id="sheets-config-error" class="hidden p-3 bg-red-100 text-red-700 rounded-md"></div>
+                <div id="sheets-config-success" class="hidden p-3 bg-green-100 text-green-700 rounded-md"></div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Spreadsheet ID *</label>
+                    <input type="text" id="config-spreadsheet-id" class="w-full p-2 border rounded" placeholder="Enter your Google Sheet ID">
+                    <p class="text-xs text-gray-500 mt-1">From your Google Sheet URL: docs.google.com/spreadsheets/d/<strong>SPREADSHEET_ID</strong>/edit</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sheet Name</label>
+                    <input type="text" id="config-sheet-name" class="w-full p-2 border rounded" placeholder="Projects" value="Projects">
+                    <p class="text-xs text-gray-500 mt-1">Name of the sheet tab (default: "Projects")</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Service Account Key (JSON) *</label>
+                    <textarea id="config-service-account-key" class="w-full h-48 p-2 border rounded font-mono text-xs" placeholder="Paste your service account JSON key here..."></textarea>
+                    <p class="text-xs text-gray-500 mt-1">
+                        <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-blue-600 hover:underline">Create service account</a> and download JSON key.
+                        <a href="GOOGLE_SHEETS_SETUP.md" target="_blank" class="text-blue-600 hover:underline ml-2">See setup guide</a>
+                    </p>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <p class="text-sm text-gray-600 mb-2">Or use API Key (alternative):</p>
+                    <input type="text" id="config-api-key" class="w-full p-2 border rounded" placeholder="Enter API Key (optional)">
+                </div>
+                
+                <div id="sheets-status" class="p-3 bg-gray-50 rounded-md">
+                    <p class="text-sm font-medium text-gray-700">Status:</p>
+                    <p id="sheets-status-text" class="text-sm text-gray-600">Checking configuration...</p>
+                </div>
+            </div>
+            <div class="sticky bottom-0 bg-gray-50 border-t px-6 py-3 flex justify-between items-center">
+                <a href="GOOGLE_SHEETS_SETUP.md" target="_blank" class="text-sm text-blue-600 hover:underline">Need help? View setup guide</a>
+                <div class="flex space-x-3">
+                    <button id="cancel-sheets-config-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+                    <button id="save-sheets-config-btn" class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700">Save Configuration</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="import-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4 modal-backdrop opacity-0 pointer-events-none no-print">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-full overflow-y-auto modal-content transform scale-95">
+            <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center z-10">
+                <h2 class="text-xl font-bold">Import Data from CSV</h2>
+                <button id="close-import-modal-btn" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div id="import-error" class="hidden p-3 bg-red-100 text-red-700 rounded-md"></div>
+                <p class="text-sm text-gray-600">Export your spreadsheet as a CSV file, then copy and paste the entire content below. This will overwrite all current data in the dashboard.</p>
+                <textarea id="csv-input" class="w-full h-64 p-2 border rounded" placeholder="Paste CSV data here..."></textarea>
+            </div>
+             <div class="sticky bottom-0 bg-gray-50 border-t px-6 py-3 flex justify-end space-x-3">
+                <button id="cancel-import-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+                <button id="confirm-import-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Update Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+const API_BASE = '/api/projects';
+let projectData = [];
+let activeLikelihoodFilter = 'All';
+let activeTypeFilter = 'All';
+let currentEditingIndex = null;
+
+// API Functions
+async function fetchProjects() {
+    try {
+        const response = await fetch(API_BASE);
+        if (!response.ok) throw new Error('Failed to fetch projects');
+        projectData = await response.json();
+        updateAllUI();
+    } catch (error) {
+        console.error('Error fetching projects:', error);
+        document.getElementById('dashboard-table-body').innerHTML = 
+            `<tr><td colspan="5" class="text-center py-10 text-red-500">Error loading projects. Please refresh the page.</td></tr>`;
+    }
+}
+
+async function saveProject(index, projectData) {
+    try {
+        const response = await fetch(`${API_BASE}/${index}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(projectData)
+        });
+        if (!response.ok) throw new Error('Failed to save project');
+        await fetchProjects(); // Refresh data
+        return true;
+    } catch (error) {
+        console.error('Error saving project:', error);
+        alert('Failed to save project. Please try again.');
+        return false;
+    }
+}
+
+async function createProject(projectData) {
+    try {
+        const response = await fetch(API_BASE, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(projectData)
+        });
+        if (!response.ok) throw new Error('Failed to create project');
+        await fetchProjects(); // Refresh data
+        return true;
+    } catch (error) {
+        console.error('Error creating project:', error);
+        alert('Failed to create project. Please try again.');
+        return false;
+    }
+}
+
+async function deleteProject(index) {
+    try {
+        const response = await fetch(`${API_BASE}/${index}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete project');
+        await fetchProjects(); // Refresh data
+        return true;
+    } catch (error) {
+        console.error('Error deleting project:', error);
+        alert('Failed to delete project. Please try again.');
+        return false;
+    }
+}
+
+function getLikelihoodPill(likelihood) {
+    const lowerLikelihood = String(likelihood || '').toLowerCase();
+    switch (lowerLikelihood) {
+        case 'launching': return 'status-blue';
+        case 'high': return 'status-green';
+        case 'medium': return 'status-yellow';
+        case 'pending decision': return 'status-yellow';
+        case 'low': return 'status-red';
+        case 'in progress': return 'status-yellow';
+        case 'complete': return 'status-blue';
+        case 'scheduled': return 'status-purple';
+        case 'blocked': return 'status-red';
+        default: return 'status-gray';
+    }
+}
+
+function getProjectTypeTag(type) {
+    switch (type) {
+        case 'New B&M': return 'tag-sky';
+        case 'Relocation': return 'tag-emerald';
+        case 'Rebranding': return 'tag-amber';
+        case 'Offboard': return 'tag-rose';
+        case 'Virtual District Ptnr': return 'tag-purple';
+        default: return 'tag-gray';
+    }
+}
+
+function updateAllUI() {
+    updateCounts();
+    renderTypeFilters();
+    applyFilters();
+}
+
+function updateCounts() {
+    const counts = { active: 0, launching: 0, high: 0, medium: 0, low: 0 };
+    projectData.forEach(p => {
+        if (p.likelihood !== 'Complete') counts.active++;
+        if (p.likelihood === 'Launching') counts.launching++;
+        if (p.likelihood === 'High') counts.high++;
+        if (p.likelihood === 'Medium' || p.likelihood === 'Pending Decision') counts.medium++;
+        if (p.likelihood === 'Low') counts.low++;
+    });
+    document.getElementById('active-projects-count').textContent = counts.active;
+    document.getElementById('launching-count').textContent = counts.launching;
+    document.getElementById('high-likelihood-count').textContent = counts.high;
+    document.getElementById('medium-likelihood-count').textContent = counts.medium;
+    document.getElementById('low-likelihood-count').textContent = counts.low;
+}
+
+function renderTypeFilters() {
+    const typeFiltersContainer = document.getElementById('type-filters');
+    const projectTypes = ['All', ...new Set(projectData.map(p => p.projectType))];
+    
+    typeFiltersContainer.innerHTML = projectTypes.map(type => `
+        <button data-filter="${type}" class="filter-btn ${type === activeTypeFilter ? 'active' : ''} bg-white hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-full shadow-sm">
+            ${type}
+        </button>
+    `).join('');
+
+    document.querySelectorAll('#type-filters .filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            activeTypeFilter = btn.dataset.filter;
+            document.querySelectorAll('#type-filters .filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilters();
+        });
+    });
+}
+
+function populateTable(projects) {
+    const tableBody = document.getElementById('dashboard-table-body');
+    tableBody.innerHTML = '';
+    if (projects.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-500">No projects match the selected filters.</td></tr>`;
+        return;
+    }
+
+    projects.forEach((project) => {
+        const originalIndex = projectData.findIndex(p => p.name === project.name && p.area === project.area);
+        const row = document.createElement('tr');
+        row.className = 'bg-white border-b hover:bg-gray-50 cursor-pointer';
+        row.dataset.index = originalIndex;
+
+        row.innerHTML = `
+            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                ${project.name}
+                <div><span class="tag ${getProjectTypeTag(project.projectType)}">${project.projectType}</span></div>
+            </td>
+            <td class="px-6 py-4">${project.area}</td>
+            <td class="px-6 py-4 text-xs">
+                <div class="font-semibold">${project.grades} (${project.program})</div>
+                <div class="text-gray-500">${project.address}</div>
+            </td>
+            <td class="px-6 py-4 font-medium text-gray-700">${project.dependencies}</td>
+            <td class="px-6 py-4">
+                <span class="status-pill ${getLikelihoodPill(project.likelihood)}">${project.likelihood}</span>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+    
+    document.querySelectorAll('#dashboard-table-body tr').forEach(r => {
+        r.addEventListener('click', () => openModal(r.dataset.index));
+    });
+}
+
+function applyFilters() {
+    let filteredData = [...projectData];
+    
+    if (activeLikelihoodFilter !== 'All') {
+         if (activeLikelihoodFilter === 'Medium') {
+            filteredData = filteredData.filter(p => p.likelihood === 'Medium' || p.likelihood === 'Pending Decision');
+        } else {
+            filteredData = filteredData.filter(p => p.likelihood === activeLikelihoodFilter);
+        }
+    }
+
+    if (activeTypeFilter !== 'All') {
+        filteredData = filteredData.filter(p => p.projectType === activeTypeFilter);
+    }
+
+    populateTable(filteredData);
+}
+
+function openModal(index, isEditMode = false) {
+    currentEditingIndex = index;
+    const project = projectData[index];
+    if (!project) return;
+
+    const modalBackdrop = document.querySelector('#details-modal');
+    const modalContent = document.querySelector('#details-modal .modal-content');
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
+    const modalFooter = document.getElementById('modal-footer');
+
+    modalTitle.innerHTML = isEditMode ? `<input id="edit-name" class="edit-input font-bold" value="${project.name}">` : project.name;
+
+    const likelihoodOptions = ['Launching', 'High', 'Medium', 'Low', 'Pending Decision'];
+    const projectTypeOptions = ['New B&M', 'Relocation', 'Rebranding', 'Offboard', 'Virtual District Ptnr'];
+    const milestoneStatusOptions = ['Pending', 'In Progress', 'Scheduled', 'Complete', 'Blocked'];
+
+    let milestonesHtml = '';
+    if (isEditMode) {
+        milestonesHtml = (project.details.milestones || []).map((m, i) => `
+            <li class="flex items-center gap-2 py-2 border-b last:border-b-0 milestone-edit-item">
+                <input class="edit-input milestone-name" value="${m.name}">
+                <select class="edit-input milestone-status w-48">${milestoneStatusOptions.map(o => `<option value="${o}" ${o === m.status ? 'selected' : ''}>${o}</option>`).join('')}</select>
+                <button class="remove-milestone-btn text-red-500 hover:text-red-700 text-2xl font-bold">&times;</button>
+            </li>
+        `).join('');
+    } else {
+         milestonesHtml = (project.details.milestones || []).map(m => `
+            <li class="flex items-center justify-between py-2 border-b last:border-b-0">
+                <span>${m.name}</span>
+                <span class="status-pill ${getLikelihoodPill(m.status)}">${m.status}</span>
+            </li>
+        `).join('');
+    }
+
+    modalBody.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Key Info</h4>
+                ${isEditMode ? `
+                <div class="space-y-2">
+                    <p><span class="font-semibold">Project Type:</span> <select id="edit-projectType" class="edit-input">${projectTypeOptions.map(o => `<option value="${o}" ${o === project.projectType ? 'selected' : ''}>${o}</option>`).join('')}</select></p>
+                    <p><span class="font-semibold">Area:</span> <input id="edit-area" class="edit-input" value="${project.area}"></p>
+                    <p><span class="font-semibold">Address:</span> <input id="edit-address" class="edit-input" value="${project.address}"></p>
+                    <p><span class="font-semibold">Grades:</span> <input id="edit-grades" class="edit-input" value="${project.grades}"></p>
+                    <p><span class="font-semibold">Program:</span> <input id="edit-program" class="edit-input" value="${project.program}"></p>
+                    <p><span class="font-semibold">Likelihood:</span> <select id="edit-likelihood" class="edit-input">${likelihoodOptions.map(o => `<option value="${o}" ${o === project.likelihood ? 'selected' : ''}>${o}</option>`).join('')}</select></p>
+                    <p><span class="font-semibold">Dependency:</span> <input id="edit-dependencies" class="edit-input" value="${project.dependencies}"></p>
+                </div>
+                ` : `
+                <div class="space-y-1">
+                    <p><span class="font-semibold">Project Type:</span> ${project.projectType}</p>
+                    <p><span class="font-semibold">Likelihood:</span> <span class="status-pill ${getLikelihoodPill(project.likelihood)}">${project.likelihood}</span></p>
+                    <p><span class="font-semibold">Dependency:</span> ${project.dependencies}</p>
+                    ${project.details.notes ? `<div class="pt-2"><h5 class="font-semibold text-gray-600">Note:</h5><p class="text-sm text-gray-600">${project.details.notes}</p></div>` : ''}
+                </div>
+                `}
+            </div>
+            <div>
+                <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Action Items & Notes</h4>
+                ${isEditMode ? `
+                 <div class="space-y-2">
+                    <p class="font-semibold">Decisions Needed by ELT:</p>
+                    <textarea id="edit-decisions" class="edit-input" rows="3">${project.details.decisionsNeeded || ''}</textarea>
+                    <p class="font-semibold">Notes:</p>
+                    <textarea id="edit-notes" class="edit-input" rows="4">${project.details.notes || ''}</textarea>
+                </div>
+                ` : `
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+                    <h5 class="font-bold">Decisions Needed by ELT</h5>
+                    <p class="text-sm">${project.details.decisionsNeeded || 'None'}</p>
+                </div>
+                `}
+            </div>
+        </div>
+        <div>
+            <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">Project Milestones</h4>
+            <ul id="milestones-list" class="bg-gray-50 p-3 rounded-lg">${milestonesHtml}</ul>
+            ${isEditMode ? `<button id="add-milestone-btn" class="mt-2 text-sm text-blue-600 hover:underline">+ Add Milestone</button>` : ''}
+        </div>
+    `;
+    
+    modalFooter.innerHTML = isEditMode ? `
+        <button id="delete-btn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Delete Project</button>
+        <button id="cancel-edit-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+        <button id="save-edit-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save Changes</button>
+    ` : `
+        <button id="edit-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Edit</button>
+    `;
+
+    if (isEditMode) {
+        document.getElementById('save-edit-btn').addEventListener('click', saveChanges);
+        document.getElementById('cancel-edit-btn').addEventListener('click', () => openModal(currentEditingIndex));
+        document.getElementById('delete-btn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+                deleteProject(currentEditingIndex).then(() => closeModal());
+            }
+        });
+        document.getElementById('add-milestone-btn').addEventListener('click', addMilestone);
+        document.querySelectorAll('.remove-milestone-btn').forEach(btn => btn.addEventListener('click', (e) => e.target.closest('li').remove()));
+    } else {
+        document.getElementById('edit-btn').addEventListener('click', () => openModal(index, true));
+    }
+
+    modal.classList.remove('pointer-events-none');
+    modalBackdrop.classList.remove('opacity-0');
+    modalContent.classList.remove('scale-95');
+}
+
+function addMilestone() {
+    const list = document.getElementById('milestones-list');
+    const milestoneStatusOptions = ['Pending', 'In Progress', 'Scheduled', 'Complete', 'Blocked'];
+    const li = document.createElement('li');
+    li.className = 'flex items-center gap-2 py-2 border-b last:border-b-0 milestone-edit-item';
+    li.innerHTML = `
+        <input class="edit-input milestone-name" placeholder="New milestone name">
+        <select class="edit-input milestone-status w-48">${milestoneStatusOptions.map(o => `<option value="${o}">${o}</option>`).join('')}</select>
+        <button class="remove-milestone-btn text-red-500 hover:text-red-700 text-2xl font-bold">&times;</button>
+    `;
+    li.querySelector('.remove-milestone-btn').addEventListener('click', () => li.remove());
+    list.appendChild(li);
+}
+
+async function saveChanges() {
+    const index = currentEditingIndex;
+    if (index === null) return;
+    
+    const updatedProject = {
+        name: document.getElementById('edit-name').value,
+        projectType: document.getElementById('edit-projectType').value,
+        area: document.getElementById('edit-area').value,
+        address: document.getElementById('edit-address').value,
+        grades: document.getElementById('edit-grades').value,
+        program: document.getElementById('edit-program').value,
+        likelihood: document.getElementById('edit-likelihood').value,
+        dependencies: document.getElementById('edit-dependencies').value,
+        details: {
+            decisionsNeeded: document.getElementById('edit-decisions').value,
+            notes: document.getElementById('edit-notes').value,
+            milestones: []
+        }
+    };
+
+    const updatedMilestones = [];
+    document.querySelectorAll('.milestone-edit-item').forEach(item => {
+        const name = item.querySelector('.milestone-name').value;
+        const status = item.querySelector('.milestone-status').value;
+        if (name) {
+            updatedMilestones.push({ name, status });
+        }
+    });
+    updatedProject.details.milestones = updatedMilestones;
+    
+    const success = await saveProject(index, updatedProject);
+    if (success) {
+        closeModal();
+    }
+}
+
+function closeModal() {
+    const modalBackdrop = document.querySelector('#details-modal');
+    const modalContent = document.querySelector('#details-modal .modal-content');
+    const modal = document.getElementById('details-modal');
+    modal.classList.add('pointer-events-none');
+    modalBackdrop.classList.add('opacity-0');
+    modalContent.classList.add('scale-95');
+    currentEditingIndex = null;
+}
+
+function openImportModal() {
+    const modalContent = document.querySelector('#import-modal .modal-content');
+    const importModal = document.getElementById('import-modal');
+    importModal.classList.remove('pointer-events-none');
+    importModal.classList.remove('opacity-0');
+    modalContent.classList.remove('scale-95');
+}
+
+function closeImportModal() {
+    const modalContent = document.querySelector('#import-modal .modal-content');
+    const importModal = document.getElementById('import-modal');
+    importModal.classList.add('pointer-events-none');
+    importModal.classList.add('opacity-0');
+    modalContent.classList.add('scale-95');
+    document.getElementById('csv-input').value = '';
+    document.getElementById('import-error').classList.add('hidden');
+}
+
+function formatCsvField(data) {
+    const stringData = String(data || '').replace(/"/g, '""');
+    return `"${stringData}"`;
+}
+
+function exportToCSV() {
+    const headers = ['name','projectType','area','address','grades','program','likelihood','dependencies','decisionsNeeded','notes','milestones'];
+    const rows = projectData.map(p => {
+         const milestoneString = JSON.stringify(p.details.milestones || []);
+         return [
+            formatCsvField(p.name),
+            formatCsvField(p.projectType),
+            formatCsvField(p.area),
+            formatCsvField(p.address),
+            formatCsvField(p.grades),
+            formatCsvField(p.program),
+            formatCsvField(p.likelihood),
+            formatCsvField(p.dependencies),
+            formatCsvField(p.details.decisionsNeeded),
+            formatCsvField(p.details.notes),
+            formatCsvField(milestoneString)
+        ].join(',');
+    });
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "school_launch_portfolio.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+async function importFromCSV() {
+    const csvText = document.getElementById('csv-input').value;
+    const errorDiv = document.getElementById('import-error');
+    if (!csvText) {
+        errorDiv.textContent = "Please paste CSV data first.";
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+    try {
+        const lines = csvText.trim().split('\n');
+        const headersLine = lines.shift();
+        const headers = headersLine.split(',').map(h => h.trim().replace(/"/g, ''));
+        const newData = [];
+        
+        for(const line of lines) {
+            const data = [];
+            let currentField = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"' && line[i+1] === '"') {
+                    currentField += '"';
+                    i++;
+                } else if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    data.push(currentField.trim());
+                    currentField = '';
+                } else {
+                    currentField += char;
+                }
+            }
+            data.push(currentField.trim());
+
+            const obj = {};
+            for(let j=0; j<headers.length; j++){
+                let val = data[j] ? data[j].replace(/^"|"$/g, '').replace(/""/g, '"') : '';
+                 if (headers[j] === 'milestones') {
+                    try {
+                       val = val ? JSON.parse(val) : [];
+                       if (!Array.isArray(val) || !val.every(item => typeof item === 'object' && 'name' in item && 'status' in item)) {
+                           val = [];
+                       }
+                    } catch (parseError) {
+                        console.error("Error parsing milestones:", val, parseError);
+                        val = [];
+                    }
+                }
+                if (['decisionsNeeded', 'notes', 'milestones'].includes(headers[j])) {
+                    if (!obj.details) obj.details = {};
+                    obj.details[headers[j]] = val;
+                } else {
+                    obj[headers[j]] = val;
+                }
+            }
+            newData.push(obj);
+        }
+        
+        // Save each project via API
+        for (const project of newData) {
+            await createProject(project);
+        }
+        
+        closeImportModal();
+        await fetchProjects(); // Refresh UI
+    } catch (e) {
+        errorDiv.textContent = "Error parsing CSV data. Please check the format. Details: " + e.message;
+        errorDiv.classList.remove('hidden');
+        console.error("CSV Import Error:", e);
+    }
+}
+
+async function openAddProjectModal() {
+    const newProject = {
+        name: "New Project",
+        projectType: "New B&M",
+        area: "",
+        address: "",
+        grades: "",
+        program: "",
+        likelihood: "Medium",
+        dependencies: "",
+        details: {
+            decisionsNeeded: "",
+            notes: "",
+            milestones: []
+        }
+    };
+    
+    // Create project via API first
+    const success = await createProject(newProject);
+    if (success) {
+        // Find the newly created project's index
+        await fetchProjects();
+        const newIndex = projectData.length - 1;
+        openModal(newIndex, true);
+    }
+}
+
+// Google Sheets Functions
+async function checkSheetsConfig() {
+    try {
+        const response = await fetch('/api/sheets/config');
+        const config = await response.json();
+        
+        if (config.configured) {
+            document.getElementById('sheets-sync-buttons').classList.remove('hidden');
+            return true;
+        } else {
+            document.getElementById('sheets-sync-buttons').classList.add('hidden');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error checking sheets config:', error);
+        return false;
+    }
+}
+
+async function saveSheetsConfig() {
+    const spreadsheetId = document.getElementById('config-spreadsheet-id').value.trim();
+    const sheetName = document.getElementById('config-sheet-name').value.trim() || 'Projects';
+    const serviceAccountKey = document.getElementById('config-service-account-key').value.trim();
+    const apiKey = document.getElementById('config-api-key').value.trim();
+    
+    const errorDiv = document.getElementById('sheets-config-error');
+    const successDiv = document.getElementById('sheets-config-success');
+    
+    errorDiv.classList.add('hidden');
+    successDiv.classList.add('hidden');
+    
+    if (!spreadsheetId) {
+        errorDiv.textContent = 'Spreadsheet ID is required';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+    
+    if (!serviceAccountKey && !apiKey) {
+        errorDiv.textContent = 'Either Service Account Key or API Key is required';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+    
+    let parsedKey = null;
+    if (serviceAccountKey) {
+        try {
+            parsedKey = JSON.parse(serviceAccountKey);
+        } catch (e) {
+            errorDiv.textContent = 'Service Account Key must be valid JSON';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+    }
+    
+    try {
+        const response = await fetch('/api/sheets/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                spreadsheetId,
+                sheetName,
+                serviceAccountKey: parsedKey,
+                apiKey: apiKey || null
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            successDiv.textContent = result.message || 'Configuration saved successfully!';
+            successDiv.classList.remove('hidden');
+            await checkSheetsConfig();
+            setTimeout(() => {
+                closeSheetsConfigModal();
+            }, 1500);
+        } else {
+            errorDiv.textContent = result.error || 'Failed to save configuration';
+            errorDiv.classList.remove('hidden');
+        }
+    } catch (error) {
+        errorDiv.textContent = 'Error saving configuration: ' + error.message;
+        errorDiv.classList.remove('hidden');
+    }
+}
+
+async function syncToSheets() {
+    const btn = document.getElementById('sync-to-sheets-btn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<div class="loading"></div> Syncing...';
+    
+    try {
+        const response = await fetch('/api/sheets/sync-to', {
+            method: 'POST'
+        });
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(`✅ ${result.message}`);
+        } else {
+            alert(`❌ Error: ${result.error}`);
+        }
+    } catch (error) {
+        alert(`❌ Error syncing to Google Sheets: ${error.message}`);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+async function syncFromSheets() {
+    if (!confirm('This will replace all current dashboard data with data from Google Sheets. Continue?')) {
+        return;
+    }
+    
+    const btn = document.getElementById('sync-from-sheets-btn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<div class="loading"></div> Syncing...';
+    
+    try {
+        const response = await fetch('/api/sheets/sync-from', {
+            method: 'POST'
+        });
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(`✅ ${result.message}`);
+            await fetchProjects();
+        } else {
+            alert(`❌ Error: ${result.error}`);
+        }
+    } catch (error) {
+        alert(`❌ Error syncing from Google Sheets: ${error.message}`);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+function openSheetsConfigModal() {
+    const modal = document.getElementById('sheets-config-modal');
+    const modalContent = document.querySelector('#sheets-config-modal .modal-content');
+    modal.classList.remove('pointer-events-none');
+    modal.classList.remove('opacity-0');
+    modalContent.classList.remove('scale-95');
+    
+    // Load current config
+    fetch('/api/sheets/config')
+        .then(res => res.json())
+        .then(config => {
+            if (config.configured) {
+                document.getElementById('sheets-status-text').textContent = '✓ Google Sheets is configured';
+                document.getElementById('sheets-status').classList.remove('bg-gray-50');
+                document.getElementById('sheets-status').classList.add('bg-green-50');
+            } else {
+                document.getElementById('sheets-status-text').textContent = 'Google Sheets is not configured';
+                document.getElementById('sheets-status').classList.remove('bg-green-50');
+                document.getElementById('sheets-status').classList.add('bg-gray-50');
+            }
+        });
+}
+
+function closeSheetsConfigModal() {
+    const modal = document.getElementById('sheets-config-modal');
+    const modalContent = document.querySelector('#sheets-config-modal .modal-content');
+    modal.classList.add('pointer-events-none');
+    modal.classList.add('opacity-0');
+    modalContent.classList.add('scale-95');
+    document.getElementById('sheets-config-error').classList.add('hidden');
+    document.getElementById('sheets-config-success').classList.add('hidden');
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('details-modal');
+    const importModal = document.getElementById('import-modal');
+    const sheetsConfigModal = document.getElementById('sheets-config-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const printBtn = document.getElementById('print-btn');
+    const exportBtn = document.getElementById('export-btn');
+    const importBtn = document.getElementById('import-btn');
+    const addProjectBtn = document.getElementById('add-project-btn');
+    const sheetsConfigBtn = document.getElementById('sheets-config-btn');
+    const syncToSheetsBtn = document.getElementById('sync-to-sheets-btn');
+    const syncFromSheetsBtn = document.getElementById('sync-from-sheets-btn');
+    const closeImportModalBtn = document.getElementById('close-import-modal-btn');
+    const cancelImportBtn = document.getElementById('cancel-import-btn');
+    const confirmImportBtn = document.getElementById('confirm-import-btn');
+    const closeSheetsConfigModalBtn = document.getElementById('close-sheets-config-modal-btn');
+    const cancelSheetsConfigBtn = document.getElementById('cancel-sheets-config-btn');
+    const saveSheetsConfigBtn = document.getElementById('save-sheets-config-btn');
+
+    // Initial load
+    fetchProjects();
+    checkSheetsConfig();
+
+    // Filter listeners
+    document.querySelectorAll('#likelihood-filters .filter-tile').forEach(tile => {
+        tile.addEventListener('click', () => {
+            activeLikelihoodFilter = tile.dataset.filter;
+            document.querySelectorAll('#likelihood-filters .filter-tile').forEach(t => t.classList.remove('active'));
+            tile.classList.add('active');
+            applyFilters();
+        });
+    });
+    
+    // Button listeners
+    printBtn.addEventListener('click', () => window.print());
+    exportBtn.addEventListener('click', exportToCSV);
+    importBtn.addEventListener('click', openImportModal);
+    addProjectBtn.addEventListener('click', openAddProjectModal);
+
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    closeImportModalBtn.addEventListener('click', closeImportModal);
+    cancelImportBtn.addEventListener('click', closeImportModal);
+    confirmImportBtn.addEventListener('click', importFromCSV);
+    importModal.addEventListener('click', (e) => { if (e.target === importModal) closeImportModal(); });
+
+    // Google Sheets listeners
+    sheetsConfigBtn.addEventListener('click', openSheetsConfigModal);
+    syncToSheetsBtn.addEventListener('click', syncToSheets);
+    syncFromSheetsBtn.addEventListener('click', syncFromSheets);
+    closeSheetsConfigModalBtn.addEventListener('click', closeSheetsConfigModal);
+    cancelSheetsConfigBtn.addEventListener('click', closeSheetsConfigModal);
+    saveSheetsConfigBtn.addEventListener('click', saveSheetsConfig);
+    sheetsConfigModal.addEventListener('click', (e) => { if (e.target === sheetsConfigModal) closeSheetsConfigModal(); });
+});
+</script>
+</body>
+</html>
+
