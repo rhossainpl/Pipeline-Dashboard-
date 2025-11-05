@@ -467,11 +467,13 @@ function populateTable(projects) {
         return;
     }
 
-    projects.forEach((project) => {
+    projects.forEach((project, filteredIndex) => {
         const originalIndex = projectData.findIndex(p => p.name === project.name && p.area === project.area);
         const row = document.createElement('tr');
         row.className = 'bg-white border-b hover:bg-gray-50 cursor-pointer';
-        row.dataset.index = originalIndex;
+        // Use the found index, or fall back to finding by project object reference
+        const indexToUse = originalIndex >= 0 ? originalIndex : projectData.findIndex(p => p === project);
+        row.dataset.index = indexToUse >= 0 ? indexToUse : 0; // Fallback to 0 if not found
 
         row.innerHTML = `
             <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -492,7 +494,15 @@ function populateTable(projects) {
     });
     
     document.querySelectorAll('#dashboard-table-body tr').forEach(r => {
-        r.addEventListener('click', () => openModal(r.dataset.index));
+        r.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const index = parseInt(r.dataset.index, 10);
+            if (!isNaN(index) && index >= 0) {
+                openModal(index);
+            } else {
+                console.error('Invalid index:', r.dataset.index);
+            }
+        });
     });
 }
 
@@ -515,9 +525,20 @@ function applyFilters() {
 }
 
 function openModal(index, isEditMode = false) {
-    currentEditingIndex = index;
-    const project = projectData[index];
-    if (!project) return;
+    const numIndex = parseInt(index, 10);
+    if (isNaN(numIndex) || numIndex < 0 || numIndex >= projectData.length) {
+        console.error('Invalid project index:', index, 'Project data length:', projectData.length);
+        alert('Error: Could not open project details. Please refresh the page.');
+        return;
+    }
+    
+    currentEditingIndex = numIndex;
+    const project = projectData[numIndex];
+    if (!project) {
+        console.error('Project not found at index:', numIndex);
+        alert('Error: Project not found. Please refresh the page.');
+        return;
+    }
 
     const modalBackdrop = document.querySelector('#details-modal');
     const modalContent = document.querySelector('#details-modal .modal-content');
